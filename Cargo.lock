@@ -95,6 +95,8 @@ version = "0.1.0"
 dependencies = [
  "pest",
  "pest_meta",
+ "proc-macro2",
+ "syn",
 ]
 
 [[package]]

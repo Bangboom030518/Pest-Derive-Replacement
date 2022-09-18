@@ -11,6 +11,8 @@ proc-macro = true
 [dependencies]
 pest = "2.3.0"
 pest_meta = "2.3.0"
+syn = "1.0"
+proc-macro2 = "1.0"
 
 [[bin]]
 name = "src"
