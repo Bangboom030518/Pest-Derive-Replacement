@@ -5,8 +5,8 @@ extern crate proc_macro;
 use pest::iterators::{Pair as PestPair, Pairs as PestPairs};
 use pest_meta::parser::{parse, Rule};
 use proc_macro::TokenStream;
-use std::str::FromStr;
 use syn::DeriveInput;
+use quote::quote;
 
 mod attribute;
 mod log;
@@ -27,26 +27,20 @@ pub fn derive_parser(input: TokenStream) -> TokenStream {
     let ast: DeriveInput = syn::parse2(input.into()).unwrap();
     let attribute::GrammarFile {
         content: grammar_string,
-        path,
+        ..
     } = attribute::get_file(&ast);
+    let name = ast.ident;
+    let tokens = {
+        quote! {
+            impl #name {
+                fn parse<'a>(self) -> &'a str {
+                    "Hello World!"
+                }
+            }
+        }    
+    };
 
-    // let tokens = {
-    //     quote::quote! {
-
-    //     }    
-    // }
-
-    let mut result = format!(
-        "
-        impl {} {{
-            fn parse<'a>(&self) -> &'a str {{
-                \"Hello2!\"
-            }}
-        }}
-    ",
-        ast.ident
-    );
-    log::log(&result);
+    log::log(&tokens.to_string());
     let grammar = parse(Rule::grammar_rules, &grammar_string)
         .unwrap_or_else(|err| panic!("Error parsing grammar: {}", err));
     for pair in grammar {
@@ -60,7 +54,7 @@ pub fn derive_parser(input: TokenStream) -> TokenStream {
             ),
         };
     }
-    TokenStream::from_str(&result).expect("Couldn't parse input as tokens")
+    tokens.into()
 }
 
 /// Returns enum from rule

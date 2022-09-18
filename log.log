@@ -1,18 +1,3 @@
 expression(43, 47, [term(43, 47, [string(43, 46, [quote(43, 44), inner_str(44, 45), quote(45, 46)])])])
 expression(6, 30, [term(6, 15, [range(6, 14, [character(6, 9, [single_quote(6, 7), inner_chr(7, 8), single_quote(8, 9)]), range_operator(9, 11), character(11, 14, [single_quote(11, 12), inner_chr(12, 13), single_quote(13, 14)])])]), choice_operator(15, 16), term(17, 26, [string(17, 25, [quote(17, 18), inner_str(18, 24), quote(24, 25)])]), choice_operator(26, 27), term(28, 30, [identifier(28, 29)])])
-
-        impl GrammarParser {
-            fn parse<'a>(&self) -> &'a str {
-                "Hello2!"
-            }
-        }
-    
-expression(43, 47, [term(43, 47, [string(43, 46, [quote(43, 44), inner_str(44, 45), quote(45, 46)])])])
-expression(6, 30, [term(6, 15, [range(6, 14, [character(6, 9, [single_quote(6, 7), inner_chr(7, 8), single_quote(8, 9)]), range_operator(9, 11), character(11, 14, [single_quote(11, 12), inner_chr(12, 13), single_quote(13, 14)])])]), choice_operator(15, 16), term(17, 26, [string(17, 25, [quote(17, 18), inner_str(18, 24), quote(24, 25)])]), choice_operator(26, 27), term(28, 30, [identifier(28, 29)])])
-
-        impl GrammarParser {
-            fn parse<'a>(&self) -> &'a str {
-                "Hello2!"
-            }
-        }
-    
+impl GrammarParser { fn parse < 'a > (self) -> & 'a str { "Hello World!" } }
