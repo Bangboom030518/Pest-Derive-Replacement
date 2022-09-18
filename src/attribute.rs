@@ -1,5 +1,8 @@
+use std::path::{Path, PathBuf};
+use std::{env, fs};
 use syn::{Attribute, DeriveInput, Lit, Meta};
-pub fn get(ast: DeriveInput) -> String {
+
+fn get_path(ast: DeriveInput) -> String {
     let grammar: Vec<&Attribute> = ast
         .attrs
         .iter()
@@ -25,3 +28,41 @@ fn from_attribute(attr: &Attribute) -> String {
         _ => panic!("grammar attribute must be of the form `grammar = \"...\"`"),
     }
 }
+
+pub struct GrammarFile {
+    pub content: String,
+    pub path: PathBuf,
+}
+
+fn read_file(path: &str) -> GrammarFile {
+    let root = env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".into());
+
+    // Check whether we can find a file at the path relative to the CARGO_MANIFEST_DIR
+    // first.
+    //
+    // If we cannot find the expected file over there, fallback to the
+    // `CARGO_MANIFEST_DIR/src`, which is the old default and kept for convenience
+    // reasons.
+    // https://doc.rust-lang.org/std/path/fn.absolute.html
+    let path = if Path::new(&root).join(&path).exists() {
+        Path::new(&root).join(&path)
+    } else {
+        Path::new(&root).join("src/").join(&path)
+    };
+
+    let file_name = match path.file_name() {
+        Some(file_name) => file_name,
+        None => panic!("grammar attribute should point to a file"),
+    };
+
+    let content = match fs::read_to_string(&path) {
+        Ok(data) => data,
+        Err(error) => panic!("error opening {:?}: {}", file_name, error),
+    };
+    GrammarFile { content, path }
+}
+
+pub fn get_file(ast: DeriveInput) -> GrammarFile {
+    read_file(&get_path(ast))
+}
+

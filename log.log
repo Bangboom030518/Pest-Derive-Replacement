@@ -15,6 +15,40 @@ expression ("2 ")
 
 closing_brace (})
 
+identifier (num_1)
+
+assignment_operator (=)
+
+opening_brace ({)
+
+expression ("1" )
+	term ("1" )
+		string ("1")
+			quote (")
+
+			inner_str (1)
+
+			quote (")
+
+closing_brace (})
+
+identifier (num)
+
+assignment_operator (=)
+
+opening_brace ({)
+
+expression (num_1 | num_1 )
+	term (num_1 )
+		identifier (num_1)
+
+	choice_operator (|)
+
+	term (num_1 )
+		identifier (num_1)
+
+closing_brace (})
+
 identifier (num_2)
 
 assignment_operator (=)
@@ -46,6 +80,23 @@ expression ("1" )
 			inner_str (1)
 
 			quote (")
+
+closing_brace (})
+
+identifier (num)
+
+assignment_operator (=)
+
+opening_brace ({)
+
+expression (num_1 | num_1 )
+	term (num_1 )
+		identifier (num_1)
+
+	choice_operator (|)
+
+	term (num_1 )
+		identifier (num_1)
 
 closing_brace (})
 
