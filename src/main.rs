@@ -6,6 +6,8 @@ use pest_test::Parser;
 #[grammar = "./grammar.pest"]
 struct GrammarParser;
 
+ 
 fn main() {
-    println!("Hello!");
+    let parser = GrammarParser;
+    println!("{}", parser.parse());
 }

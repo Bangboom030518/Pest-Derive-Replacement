@@ -1,11 +1,12 @@
-use std::fs;
+#![allow(dead_code)]
 use crate::Pairs;
+use std::fs;
 
 const LOG_FILE: &str = "log.log";
 
 const LOG_ERROR: &str = "Couldn't write to log file";
 
-pub fn log(content: &str) {
+pub fn log<T: std::fmt::Display>(content: T) {
     let file_content = fs::read_to_string(LOG_FILE).unwrap();
     fs::write(LOG_FILE, format!("{}\n{}", content, file_content)).expect(LOG_ERROR);
 }

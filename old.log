@@ -1,0 +1,122 @@
+identifier (b)
+
+assignment_operator (=)
+
+opening_brace ({)
+
+expression ("_" )
+	term ("_" )
+		string ("_")
+			quote (")
+
+			inner_str (_)
+
+			quote (")
+
+closing_brace (})
+
+--"b = { "_" }"--
+identifier (a)
+
+assignment_operator (=)
+
+opening_brace ({)
+
+expression ('a'..'z' | "Hello!" | b )
+	term ('a'..'z' )
+		range ('a'..'z')
+			character ('a')
+				single_quote (')
+
+				inner_chr (a)
+
+				single_quote (')
+
+			range_operator (..)
+
+			character ('z')
+				single_quote (')
+
+				inner_chr (z)
+
+				single_quote (')
+
+	choice_operator (|)
+
+	term ("Hello!" )
+		string ("Hello!")
+			quote (")
+
+			inner_str (Hello!)
+
+			quote (")
+
+	choice_operator (|)
+
+	term (b )
+		identifier (b)
+
+closing_brace (})
+
+--"a = { 'a'..'z' | "Hello!" | b }"--
+identifier (b)
+
+assignment_operator (=)
+
+opening_brace ({)
+
+expression ("_" )
+	term ("_" )
+		string ("_")
+			quote (")
+
+			inner_str (_)
+
+			quote (")
+
+closing_brace (})
+
+--"b = { "_" }"--
+identifier (a)
+
+assignment_operator (=)
+
+opening_brace ({)
+
+expression ('a'..'z' | "Hello!" | b )
+	term ('a'..'z' )
+		range ('a'..'z')
+			character ('a')
+				single_quote (')
+
+				inner_chr (a)
+
+				single_quote (')
+
+			range_operator (..)
+
+			character ('z')
+				single_quote (')
+
+				inner_chr (z)
+
+				single_quote (')
+
+	choice_operator (|)
+
+	term ("Hello!" )
+		string ("Hello!")
+			quote (")
+
+			inner_str (Hello!)
+
+			quote (")
+
+	choice_operator (|)
+
+	term (b )
+		identifier (b)
+
+closing_brace (})
+
+--"a = { 'a'..'z' | "Hello!" | b }"--

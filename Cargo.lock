@@ -96,6 +96,7 @@ dependencies = [
  "pest",
  "pest_meta",
  "proc-macro2",
+ "quote",
  "syn",
 ]
 

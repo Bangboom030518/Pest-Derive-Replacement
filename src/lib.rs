@@ -29,7 +29,24 @@ pub fn derive_parser(input: TokenStream) -> TokenStream {
         content: grammar_string,
         path,
     } = attribute::get_file(&ast);
-    let mut result = String::new();
+
+    // let tokens = {
+    //     quote::quote! {
+
+    //     }    
+    // }
+
+    let mut result = format!(
+        "
+        impl {} {{
+            fn parse<'a>(&self) -> &'a str {{
+                \"Hello2!\"
+            }}
+        }}
+    ",
+        ast.ident
+    );
+    log::log(&result);
     let grammar = parse(Rule::grammar_rules, &grammar_string)
         .unwrap_or_else(|err| panic!("Error parsing grammar: {}", err));
     for pair in grammar {
@@ -46,7 +63,55 @@ pub fn derive_parser(input: TokenStream) -> TokenStream {
     TokenStream::from_str(&result).expect("Couldn't parse input as tokens")
 }
 
-fn parse_rule(pair: Pair) {
-    log::log(&format!("--\"{}\"--", pair.as_span().as_str()));
-    log::log(&log::format_tree(pair.into_inner(), 0));
+/// Returns enum from rule
+fn parse_rule(pair: Pair) -> String {
+    let result = String::new();
+    let pairs = pair.into_inner();
+    let expression = expect_structure(
+        pairs,
+        &[
+            Rule::identifier,
+            Rule::assignment_operator,
+            Rule::opening_brace,
+            Rule::expression,
+            Rule::closing_brace,
+        ],
+        "rule",
+        3,
+    );
+    log::log(expression);
+    result
 }
+fn expect_structure<'a>(
+    mut pairs: Pairs<'a>,
+    rules: &'a [Rule],
+    name: &'a str,
+    index: usize,
+) -> Pair {
+    let all_pairs = pairs.clone().collect::<Vec<Pair>>();
+    let length = all_pairs.len();
+    for (index, &rule) in rules.iter().enumerate() {
+        let pair = pairs
+            .next()
+            .unwrap_or_else(|| panic!("Rule '{}' should have a child at index {}", name, index));
+        assert_eq!(
+            pair.as_rule(),
+            rule,
+            "Child {} should be the rule '{:?}'. Found '{:?}'",
+            index,
+            rule,
+            pair.as_rule()
+        );
+    }
+    all_pairs
+        .get(index)
+        .unwrap_or_else(|| {
+            panic!(
+                "Index should be in range. Trying to access index '{}' in list of length '{}'",
+                index, length
+            )
+        })
+        .clone()
+}
+
+fn parse_rule_content(pair: Pair) {}
