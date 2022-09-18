@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 use std::{env, fs};
 use syn::{Attribute, DeriveInput, Lit, Meta};
 
-fn get_path(ast: DeriveInput) -> String {
+fn get_path(ast: &DeriveInput) -> String {
     let grammar: Vec<&Attribute> = ast
         .attrs
         .iter()
@@ -62,7 +62,6 @@ fn read_file(path: &str) -> GrammarFile {
     GrammarFile { content, path }
 }
 
-pub fn get_file(ast: DeriveInput) -> GrammarFile {
+pub fn get_file(ast: &DeriveInput) -> GrammarFile {
     read_file(&get_path(ast))
 }
-
