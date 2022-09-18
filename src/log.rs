@@ -1,4 +1,6 @@
 use std::fs;
+use pest::iterators::Pairs;
+use crate::Rule;
 
 const LOG_FILE: &str = "log.log";
 
@@ -11,4 +13,18 @@ pub fn log(content: &str) {
 
 pub fn clear() {
     fs::write(LOG_FILE, "").expect(LOG_ERROR);
+}
+
+pub fn format_tree(tree: Pairs<Rule>, indent: usize) -> String {
+    let mut lines = Vec::<String>::new();
+    for node in tree {
+        lines.push(format!(
+            "{}{:?} ({})",
+            "\t".repeat(indent),
+            node.as_rule(),
+            node.as_span().as_str()
+        ));
+        lines.push(format_tree(node.into_inner(), indent + 1))
+    }
+    lines.join("\n")
 }

@@ -1,18 +1,54 @@
+#![warn(clippy::pedantic, clippy::nursery)]
+
 extern crate proc_macro;
 
 use pest::iterators::{Pair, Pairs};
 use pest_meta::parser::{parse, Rule};
 use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
-use std::{fs, str::FromStr};
-use syn::{Attribute, DeriveInput, Generics, Ident, Lit, Meta};
+use std::{env, fs, path::Path, str::FromStr};
+use syn::DeriveInput;
 
+mod attribute;
 mod log;
 
+/// Generates parser struct from grammar file
+/// 
+/// # Panics
+/// 
+/// 1. Panics if unable to open the file specified through the grammar attribute
+/// 2. Panics if the grammar attribute doesn't point to a file
+/// 3. Panics if unable to parse grammar file, due to a syntax error
 #[proc_macro_derive(Parser, attributes(grammar))]
 pub fn derive_parser(input: TokenStream) -> TokenStream {
     let ast: DeriveInput = syn::parse2(input.into()).unwrap();
-    let (name, generics, content) = parse_derive(ast);
+    let grammar_path = attribute::get(ast);
+    let (data, path) = {
+        let root = env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".into());
+
+        // Check whether we can find a file at the path relative to the CARGO_MANIFEST_DIR
+        // first.
+        //
+        // If we cannot find the expected file over there, fallback to the
+        // `CARGO_MANIFEST_DIR/src`, which is the old default and kept for convenience
+        // reasons.
+        // https://doc.rust-lang.org/std/path/fn.absolute.html
+        let path = if Path::new(&root).join(&grammar_path).exists() {
+            Path::new(&root).join(&grammar_path)
+        } else {
+            Path::new(&root).join("src/").join(&grammar_path)
+        };
+
+        let file_name = match path.file_name() {
+            Some(file_name) => file_name,
+            None => panic!("grammar attribute should point to a file"),
+        };
+
+        let data = match fs::read_to_string(&path) {
+            Ok(data) => data,
+            Err(error) => panic!("error opening {:?}: {}", file_name, error),
+        };
+        (data, Some(path.clone()))
+    };
     let mut result = String::new();
     log::clear();
     let grammar_string =
@@ -34,26 +70,6 @@ pub fn derive_parser(input: TokenStream) -> TokenStream {
     TokenStream::from_str(&result).expect("Couldn't parse input as tokens")
 }
 
-enum GrammarSource {
-    File(String),
-    Inline(String),
-}
-
 fn parse_rule(pair: Pair<Rule>) {
-    log::log(&format_tree(pair.into_inner(), 0))
+    log::log(&log::format_tree(pair.into_inner(), 0))
 }
-
-fn format_tree(tree: Pairs<Rule>, indent: usize) -> String {
-    let mut lines = Vec::<String>::new();
-    for node in tree {
-        lines.push(format!(
-            "{}{:?} ({})",
-            "\t".repeat(indent),
-            node.as_rule(),
-            node.as_span().as_str()
-        ));
-        lines.push(format_tree(node.into_inner(), indent + 1))
-    }
-    lines.join("\n")
-}
-
