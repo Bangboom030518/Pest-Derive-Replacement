@@ -2,14 +2,16 @@
 
 extern crate proc_macro;
 
+use parser::Expression;
 use pest::iterators::{Pair as PestPair, Pairs as PestPairs};
 use pest_meta::parser::{parse, Rule};
 use proc_macro::TokenStream;
-use syn::DeriveInput;
 use quote::quote;
+use syn::DeriveInput;
 
 mod attribute;
 mod log;
+mod parser;
 
 type Pair<'a> = PestPair<'a, Rule>;
 type Pairs<'a> = PestPairs<'a, Rule>;
@@ -37,12 +39,13 @@ pub fn derive_parser(input: TokenStream) -> TokenStream {
                     "Hello World!"
                 }
             }
-        }    
+        }
     };
 
     log::log(&tokens.to_string());
     let grammar = parse(Rule::grammar_rules, &grammar_string)
         .unwrap_or_else(|err| panic!("Error parsing grammar: {}", err));
+    log::log(log::format_tree(grammar.clone(), 0));
     for pair in grammar {
         let rule = pair.as_rule();
         match rule {
@@ -58,8 +61,7 @@ pub fn derive_parser(input: TokenStream) -> TokenStream {
 }
 
 /// Returns enum from rule
-fn parse_rule(pair: Pair) -> String {
-    let result = String::new();
+fn parse_rule(pair: Pair) -> TokenStream {
     let pairs = pair.into_inner();
     let expression = expect_structure(
         pairs,
@@ -73,9 +75,43 @@ fn parse_rule(pair: Pair) -> String {
         "rule",
         3,
     );
-    log::log(expression);
-    result
+    log::log(expression.clone());
+    Expression::from(expression);
+    TokenStream::new()
 }
+
+struct Tokens<'a> {
+    content: Vec<Pair<'a>>,
+    current_index: usize,
+}
+
+impl<'a> Tokens<'a> {
+    fn next(&mut self) -> Option<&Pair<'a>> {
+        self.current_index += 1;
+        self.content.get(self.current_index)
+    }
+
+    fn peek(&self) -> Option<&Pair<'a>> {
+        self.content.get(self.current_index + 1)
+    }
+
+    fn peek_back(&self) -> Option<&Pair<'a>> {
+        self.content.get(self.current_index + 1)
+    }
+
+    fn new(content: Vec<Pair<'a>>) -> Self {
+        Self {
+            content,
+            current_index: 0,
+        }
+    }
+}
+
+enum BinaryOperator {
+    Sequence,
+    Choice,
+}
+
 fn expect_structure<'a>(
     mut pairs: Pairs<'a>,
     rules: &'a [Rule],
@@ -107,5 +143,3 @@ fn expect_structure<'a>(
         })
         .clone()
 }
-
-fn parse_rule_content(pair: Pair) {}
