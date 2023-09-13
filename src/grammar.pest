@@ -1,2 +1,30 @@
-a = { 'a'..'z' | "Hello!" | b }
-    b = { "_" }
+
+/*
+
+struct 
+
+expression(term, expression_segments(Vec<expression_segment(binary_op, term)>))
+
+Expression::Binary(Expression::Binary)
+
+match rule {
+    Rule:a => (),
+    _ => unreachable!()
+}
+
+*/
+
+expression = { binary_term ~ expression_segments }
+    expression_segments = { expression_segment* }
+        expression_segment = { binary_operator ~ binary_term }
+    binary_term = { group | literal | identifier }
+
+        group = { "(" ~ expression ~ ")" }
+
+        literal = "a"
+
+        identifier = { !keyword ~ (ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")*) }
+
+    binary_operator = { plus | minus }
+        plus = { "+" }
+        minus = { "-" }

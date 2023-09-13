@@ -85,61 +85,7 @@ struct Tokens<'a> {
     current_index: usize,
 }
 
-impl<'a> Tokens<'a> {
-    fn next(&mut self) -> Option<&Pair<'a>> {
-        self.current_index += 1;
-        self.content.get(self.current_index)
-    }
-
-    fn peek(&self) -> Option<&Pair<'a>> {
-        self.content.get(self.current_index + 1)
-    }
-
-    fn peek_back(&self) -> Option<&Pair<'a>> {
-        self.content.get(self.current_index + 1)
-    }
-
-    fn new(content: Vec<Pair<'a>>) -> Self {
-        Self {
-            content,
-            current_index: 0,
-        }
-    }
-}
-
 enum BinaryOperator {
     Sequence,
     Choice,
-}
-
-fn expect_structure<'a>(
-    mut pairs: Pairs<'a>,
-    rules: &'a [Rule],
-    name: &'a str,
-    index: usize,
-) -> Pair {
-    let all_pairs = pairs.clone().collect::<Vec<Pair>>();
-    let length = all_pairs.len();
-    for (index, &rule) in rules.iter().enumerate() {
-        let pair = pairs
-            .next()
-            .unwrap_or_else(|| panic!("Rule '{}' should have a child at index {}", name, index));
-        assert_eq!(
-            pair.as_rule(),
-            rule,
-            "Child {} should be the rule '{:?}'. Found '{:?}'",
-            index,
-            rule,
-            pair.as_rule()
-        );
-    }
-    all_pairs
-        .get(index)
-        .unwrap_or_else(|| {
-            panic!(
-                "Index should be in range. Trying to access index '{}' in list of length '{}'",
-                index, length
-            )
-        })
-        .clone()
 }
